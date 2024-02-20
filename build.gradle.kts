@@ -24,10 +24,10 @@ repositories {
 dependencies {
     if (bootstrap) {
         compileOnly(project(mapOf("path" to ":Parsek")))
-        compileOnly(project(mapOf("path" to ":plugins:database")))
+        compileOnly(project(mapOf("path" to ":plugins:parsek-plugin-database")))
     } else {
         compileOnly("com.github.StatuParsek:Parsek:main-SNAPSHOT")
-        compileOnly("com.github.StatuParsek:parsek-database:main-SNAPSHOT")
+        compileOnly("com.github.StatuParsek:parsek-plugin-database:main-SNAPSHOT")
     }
 
     compileOnly(kotlin("stdlib-jdk8"))
@@ -95,8 +95,8 @@ tasks {
 publishing {
     repositories {
         maven {
-            name = "parsek-token"
-            url = uri("https://maven.pkg.github.com/StatuParsek/parsek-token")
+            name = "parsek-plugin-token"
+            url = uri("https://maven.pkg.github.com/StatuParsek/parsek-plugin-token")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME_GITHUB")
                 password = project.findProperty("gpr.token") as String? ?: System.getenv("TOKEN_GITHUB")
@@ -107,7 +107,7 @@ publishing {
     publications {
         create<MavenPublication>("shadow") {
             project.extensions.configure<com.github.jengelman.gradle.plugins.shadow.ShadowExtension> {
-                artifactId = "parsek-token-plugin"
+                artifactId = "parsek-plugin-token"
                 component(this@create)
             }
         }
