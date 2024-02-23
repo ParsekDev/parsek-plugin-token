@@ -15,7 +15,8 @@ class ParsekEventHandler : ParsekEventListener {
             configManager,
             TokenPlugin.INSTANCE,
             TokenConfig::class.java,
-            logger
+            logger,
+            exPluginIds = listOf("token")
         )
 
         logger.info("Initialized plugin config")

@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder
 class DatabaseEventHandler : DatabaseEventListener {
 
     override suspend fun onReady(databaseManager: DatabaseManager) {
+        databaseManager.migrateNewPluginId("token", TokenPlugin.INSTANCE.context.pluginId, TokenPlugin.INSTANCE)
         databaseManager.initialize(TokenPlugin.INSTANCE, TokenPlugin.tables, TokenPlugin.migrations)
 
         TokenPlugin.databaseManager = databaseManager
