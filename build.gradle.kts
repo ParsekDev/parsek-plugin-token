@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.20"
+    kotlin("kapt") version "1.9.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     `maven-publish`
 }
@@ -32,6 +33,7 @@ dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
     compileOnly("org.pf4j:pf4j:${pf4jVersion}")
+    kapt("org.pf4j:pf4j:${pf4jVersion}")
 
     compileOnly("io.vertx:vertx-lang-kotlin:$vertxVersion")
     compileOnly("io.vertx:vertx-lang-kotlin-coroutines:$vertxVersion")
@@ -59,7 +61,7 @@ tasks {
             attributes["Plugin-Dependencies"] = pluginDependencies
         }
 
-        archiveFileName.set("$pluginId-$version-shadow.jar")
+        archiveFileName.set("$pluginId-$version.jar")
 
         dependencies {
             exclude(dependency("io.vertx:vertx-core"))
