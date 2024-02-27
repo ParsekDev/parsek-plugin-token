@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.internal.KaptTask
-
 plugins {
     kotlin("jvm") version "1.9.20"
-    kotlin("kapt") version "1.9.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     `maven-publish`
 }
@@ -35,7 +32,6 @@ dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
 
     compileOnly("org.pf4j:pf4j:${pf4jVersion}")
-    kapt("org.pf4j:pf4j:${pf4jVersion}")
 
     compileOnly("io.vertx:vertx-lang-kotlin:$vertxVersion")
     compileOnly("io.vertx:vertx-lang-kotlin-coroutines:$vertxVersion")
@@ -46,10 +42,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     compileOnly("com.google.code.gson:gson:$gsonVersion")
-}
-
-tasks.named("jar").configure {
-    enabled = false
 }
 
 tasks {
@@ -67,7 +59,7 @@ tasks {
             attributes["Plugin-Dependencies"] = pluginDependencies
         }
 
-        archiveFileName.set("$pluginId-$version.jar")
+        archiveFileName.set("$pluginId-$version-shadow.jar")
 
         dependencies {
             exclude(dependency("io.vertx:vertx-core"))
@@ -86,15 +78,10 @@ tasks {
         }
     }
 
-    build {
+    jar {
+        enabled = false
         dependsOn(shadowJar)
         dependsOn("copyJar")
-    }
-}
-
-tasks.withType<KaptTask> {
-    if (bootstrap) {
-        mustRunAfter(":plugins:parsek-plugin-database:shadowJar")
     }
 }
 
