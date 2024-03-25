@@ -27,8 +27,8 @@ dependencies {
         compileOnly(project(mapOf("path" to ":Parsek")))
         compileOnly(project(mapOf("path" to ":plugins:parsek-plugin-database")))
     } else {
-        compileOnly("com.github.StatuParsek:Parsek:main-SNAPSHOT")
-        compileOnly("com.github.StatuParsek:parsek-plugin-database:main-SNAPSHOT")
+        compileOnly("com.github.StatuParsek:Parsek:beta-SNAPSHOT")
+        compileOnly("com.github.StatuParsek:parsek-plugin-database:beta-SNAPSHOT")
     }
 
     compileOnly(kotlin("stdlib-jdk8"))
