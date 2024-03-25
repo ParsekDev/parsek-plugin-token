@@ -12,6 +12,7 @@ version =
 val pf4jVersion: String by project
 val vertxVersion: String by project
 val gsonVersion: String by project
+val springContextVersion: String by project
 val handlebarsVersion: String by project
 val bootstrap = (project.findProperty("bootstrap") as String?)?.toBoolean() ?: false
 val pluginsDir: File? by rootProject.extra
@@ -44,6 +45,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     compileOnly("com.google.code.gson:gson:$gsonVersion")
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-context
+    compileOnly("org.springframework:spring-context:$springContextVersion")
 }
 
 tasks {

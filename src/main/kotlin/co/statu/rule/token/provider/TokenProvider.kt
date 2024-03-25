@@ -1,11 +1,11 @@
 package co.statu.rule.token.provider
 
+import co.statu.parsek.PluginEventManager
 import co.statu.parsek.api.config.PluginConfigManager
-import co.statu.rule.database.Dao.Companion.get
 import co.statu.rule.database.DatabaseManager
 import co.statu.rule.token.TokenConfig
-import co.statu.rule.token.TokenPlugin
 import co.statu.rule.token.db.dao.TokenDao
+import co.statu.rule.token.db.impl.TokenDaoImpl
 import co.statu.rule.token.db.model.Token
 import co.statu.rule.token.event.TokenEventListener
 import co.statu.rule.token.type.TokenType
@@ -26,7 +26,7 @@ class TokenProvider private constructor(
         ): TokenProvider {
             val tokenProvider = TokenProvider(databaseManager, pluginConfigManager)
 
-            val handlers = TokenPlugin.INSTANCE.context.pluginEventManager.getEventHandlers<TokenEventListener>()
+            val handlers = PluginEventManager.getEventListeners<TokenEventListener>()
 
             handlers.forEach {
                 it.onReady(tokenProvider)
@@ -36,8 +36,8 @@ class TokenProvider private constructor(
         }
     }
 
-    private val tokenDao by lazy {
-        get<TokenDao>(TokenPlugin.tables)
+    private val tokenDao: TokenDao by lazy {
+        TokenDaoImpl()
     }
 
     fun getAlgorithm(): Algorithm {
