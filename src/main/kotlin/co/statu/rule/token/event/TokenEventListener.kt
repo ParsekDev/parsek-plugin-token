@@ -5,7 +5,7 @@ import co.statu.rule.token.provider.TokenProvider
 import co.statu.rule.token.type.TokenType
 
 interface TokenEventListener : PluginEventListener {
-    suspend fun onReady(tokenProvider: TokenProvider)
+    suspend fun onReady(tokenProvider: TokenProvider) {}
 
     fun registerTokenType(tokenTypeList: MutableList<TokenType>) {}
 }
