@@ -133,6 +133,58 @@ class TokenDaoImpl : TokenDao() {
         return row.toEntity()
     }
 
+    override suspend fun getByTokenAndSubject(
+        token: String,
+        subject: String,
+        jdbcPool: JDBCPool
+    ): Token? {
+        val query =
+            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` = ? AND `subject` = ?"
+
+        val rows: RowSet<Row> = jdbcPool
+            .preparedQuery(query)
+            .execute(
+                Tuple.of(
+                    token,
+                    subject
+                )
+            )
+            .await()
+
+        if (rows.size() == 0) {
+            return null
+        }
+
+        val row = rows.toList()[0]
+
+        return row.toEntity()
+    }
+
+    override suspend fun getByToken(
+        token: String,
+        jdbcPool: JDBCPool
+    ): Token? {
+        val query =
+            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` = ?"
+
+        val rows: RowSet<Row> = jdbcPool
+            .preparedQuery(query)
+            .execute(
+                Tuple.of(
+                    token,
+                )
+            )
+            .await()
+
+        if (rows.size() == 0) {
+            return null
+        }
+
+        val row = rows.toList()[0]
+
+        return row.toEntity()
+    }
+
     override suspend fun getLastBySubjectAndType(
         subject: String,
         type: TokenType,

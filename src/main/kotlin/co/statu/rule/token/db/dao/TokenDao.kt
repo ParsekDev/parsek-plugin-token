@@ -32,6 +32,17 @@ abstract class TokenDao : Dao<Token>(Token::class) {
         jdbcPool: JDBCPool
     ): Token?
 
+    abstract suspend fun getByTokenAndSubject(
+        token: String,
+        subject: String,
+        jdbcPool: JDBCPool
+    ): Token?
+
+    abstract suspend fun getByToken(
+        token: String,
+        jdbcPool: JDBCPool
+    ): Token?
+
     abstract suspend fun getLastBySubjectAndType(
         subject: String,
         type: TokenType,
