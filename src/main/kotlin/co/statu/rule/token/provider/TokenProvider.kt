@@ -159,4 +159,22 @@ class TokenProvider private constructor(
         type,
         jdbcPool
     )
+
+    suspend fun getByTokenAndSubject(
+        token: String,
+        subject: String,
+        jdbcPool: JDBCPool
+    ) = tokenDao.getByTokenAndSubject(
+        token,
+        subject,
+        jdbcPool
+    )
+
+    suspend fun getByToken(
+        token: String,
+        jdbcPool: JDBCPool
+    ) = tokenDao.getByToken(
+        token,
+        jdbcPool
+    )
 }
