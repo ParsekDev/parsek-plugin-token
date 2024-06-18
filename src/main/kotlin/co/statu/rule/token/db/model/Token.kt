@@ -2,6 +2,7 @@ package co.statu.rule.token.db.model
 
 import co.statu.rule.database.DBEntity
 import co.statu.rule.token.type.TokenType
+import io.vertx.core.json.JsonObject
 import java.util.*
 
 data class Token(
@@ -10,5 +11,6 @@ data class Token(
     val token: String,
     val type: TokenType,
     val expireDate: Long,
-    val startDate: Long = System.currentTimeMillis()
+    val startDate: Long = System.currentTimeMillis(),
+    val additionalClaims: JsonObject = JsonObject()
 ) : DBEntity()

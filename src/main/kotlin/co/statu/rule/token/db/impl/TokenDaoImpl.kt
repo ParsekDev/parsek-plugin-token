@@ -23,7 +23,8 @@ class TokenDaoImpl : TokenDao() {
                             `token` String NOT NULL,
                             `type` String NOT NULL,
                             `expireDate` Int64 NOT NULL,
-                            `startDate` Int64 NOT NULL
+                            `startDate` Int64 NOT NULL,
+                            `additionalClaims` String DEFAULT '{}'
                         ) ENGINE = MergeTree() order by `expireDate`;
                         """
             )
@@ -34,7 +35,7 @@ class TokenDaoImpl : TokenDao() {
     override suspend fun add(token: Token, jdbcPool: JDBCPool): UUID {
         val query =
             "INSERT INTO `${getTablePrefix() + tableName}` (${fields.toTableQuery()}) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)"
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)"
 
         jdbcPool
             .preparedQuery(query)
@@ -45,7 +46,8 @@ class TokenDaoImpl : TokenDao() {
                     token.token,
                     token.type.getTokenName(),
                     token.expireDate,
-                    token.startDate
+                    token.startDate,
+                    token.additionalClaims.encode()
                 )
             )
             .await()

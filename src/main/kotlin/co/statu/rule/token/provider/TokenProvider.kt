@@ -12,6 +12,7 @@ import co.statu.rule.token.type.TokenType
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
+import io.vertx.core.json.JsonObject
 import io.vertx.jdbcclient.JDBCPool
 import java.util.*
 
@@ -98,9 +99,16 @@ class TokenProvider private constructor(
         subject: String,
         tokenType: TokenType,
         expireDate: Long,
+        additionalClaims: JsonObject = JsonObject(),
         jdbcPool: JDBCPool
     ): UUID {
-        val tokenObject = Token(subject = subject, token = token, type = tokenType, expireDate = expireDate)
+        val tokenObject = Token(
+            subject = subject,
+            token = token,
+            type = tokenType,
+            expireDate = expireDate,
+            additionalClaims = additionalClaims
+        )
 
         return tokenDao.add(tokenObject, jdbcPool)
     }
