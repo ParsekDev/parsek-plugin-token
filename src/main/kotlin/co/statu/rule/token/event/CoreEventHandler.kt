@@ -22,10 +22,8 @@ class CoreEventHandler(
 
     override suspend fun onConfigManagerReady(configManager: ConfigManager) {
         val pluginConfigManager = PluginConfigManager(
-            configManager,
             tokenPlugin,
             TokenConfig::class.java,
-            exPluginIds = listOf("token")
         )
         tokenPlugin.pluginBeanContext.beanFactory.registerSingleton(
             pluginConfigManager.javaClass.name,

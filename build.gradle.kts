@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "2.0.21"
     kotlin("kapt") version "1.9.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     `maven-publish`
@@ -27,8 +27,8 @@ dependencies {
         compileOnly(project(mapOf("path" to ":Parsek")))
         compileOnly(project(mapOf("path" to ":plugins:parsek-plugin-database")))
     } else {
-        compileOnly("com.github.StatuParsek:Parsek:main-SNAPSHOT")
-        compileOnly("com.github.StatuParsek:parsek-plugin-database:main-SNAPSHOT")
+        compileOnly("com.github.parsekdev:parsek:v1.0.0-beta.7")
+        compileOnly("com.github.parsekdev:parsek-plugin-database:v1.0.0-dev.1")
     }
 
     compileOnly(kotlin("stdlib-jdk8"))
