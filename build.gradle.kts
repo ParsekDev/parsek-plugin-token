@@ -152,7 +152,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "dev.parsek"
-            artifactId = "parsek-plugin-database"
+            artifactId = "parsek-plugin-token"
             version = project.version.toString()
 
             // Use the standard jar task output
@@ -161,9 +161,9 @@ publishing {
             artifact(tasks.named("javadocJar"))
 
             pom {
-                name.set("Parsek Database Plugin")
-                description.set("Open-source modular backend in Kotlin")
-                url.set("https://github.com/ParsekDev/parsek-plugin-database")
+                name.set("Parsek Token Plugin")
+                description.set("Create and manage tokens for authentication in Parsek")
+                url.set("https://github.com/ParsekDev/parsek-plugin-token")
                 inceptionYear.set("2025")
 
                 licenses {
@@ -182,9 +182,9 @@ publishing {
                 }
 
                 scm {
-                    connection.set("scm:git:git://github.com/ParsekDev/parsek-plugin-database.git")
-                    developerConnection.set("scm:git:ssh://github.com/ParsekDev/parsek-plugin-database.git")
-                    url.set("https://github.com/ParsekDev/parsek-plugin-database")
+                    connection.set("scm:git:git://github.com/ParsekDev/parsek-plugin-token.git")
+                    developerConnection.set("scm:git:ssh://github.com/ParsekDev/parsek-plugin-token.git")
+                    url.set("https://github.com/ParsekDev/parsek-plugin-token")
                 }
             }
         }
@@ -211,12 +211,12 @@ signing {
 // JReleaser configuration
 jreleaser {
     project {
-        name.set("parsek-plugin-database")
-        description.set("Open-source modular backend in Kotlin")
+        name.set("parsek-plugin-token")
+        description.set("Create and manage tokens for authentication in Parsek")
         authors.add("Statu")
         license.set("MIT")
         links {
-            homepage.set("https://github.com/ParsekDev/parsek-plugin-database")
+            homepage.set("https://github.com/ParsekDev/parsek-plugin-token")
         }
         inceptionYear.set("2025")
     }
