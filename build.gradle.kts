@@ -108,6 +108,17 @@ tasks {
     }
 }
 
+tasks.named<Jar>("jar") {
+    // Keep jar enabled for Maven publishing
+    enabled = true
+    // Add custom naming: v before version and -api before .jar
+    if (version != "unspecified") {
+        archiveFileName.set("${rootProject.name}-v${version}-api.jar")
+    } else {
+        archiveFileName.set("${rootProject.name}-api.jar")
+    }
+}
+
 java {
     // Use Java 21 for compilation
     toolchain {
