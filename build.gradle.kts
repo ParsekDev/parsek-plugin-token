@@ -55,6 +55,7 @@ dependencies {
 
 tasks {
     build {
+        dependsOn(shadowJar)
         dependsOn("copyJar")
         // Ensure standard jar is built for Maven publishing (stays in build/libs)
         dependsOn(jar)
@@ -74,7 +75,15 @@ tasks {
             attributes["Plugin-Dependencies"] = pluginDependencies
         }
 
-        archiveFileName.set("$pluginId-$version.jar")
+        if (version != "unspecified") {
+            archiveFileName.set("$pluginId-v${version}.jar")
+        } else {
+            archiveFileName.set("$pluginId.jar")
+        }
+
+        if (project.gradle.startParameter.taskNames.contains("publish")) {
+            archiveFileName.set(archiveFileName.get().lowercase())
+        }
 
         dependencies {
             exclude(dependency("io.vertx:vertx-core"))
@@ -82,13 +91,12 @@ tasks {
                 it.moduleGroup == "io.netty" || it.moduleGroup == "org.slf4j"
             }
         }
-
-        if (project.gradle.startParameter.taskNames.contains("publish")) {
-            archiveFileName.set(archiveFileName.get().lowercase())
-        }
     }
 
     register("copyJar") {
+        outputs.upToDateWhen { false }
+        mustRunAfter(shadowJar)
+
         pluginsDir?.let {
             doLast {
                 copy {
@@ -97,9 +105,6 @@ tasks {
                 }
             }
         }
-
-        outputs.upToDateWhen { false }
-        mustRunAfter(shadowJar)
     }
 }
 
