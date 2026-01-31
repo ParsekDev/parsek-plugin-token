@@ -32,7 +32,7 @@ dependencies {
         compileOnly(project(mapOf("path" to ":plugins:parsek-plugin-database")))
     } else {
         compileOnly("dev.parsek:core:1.0.0-beta.19")
-        compileOnly("dev.parsek:parsek-plugin-database:1.0.0-dev.3")
+        compileOnly("dev.parsek:parsek-plugin-database:1.0.0-dev.5")
     }
 
     compileOnly(kotlin("stdlib-jdk8"))
