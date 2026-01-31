@@ -5,7 +5,8 @@ import co.statu.rule.token.db.dao.TokenDao
 import co.statu.rule.token.db.model.Token
 import co.statu.rule.token.type.TokenType
 import io.vertx.jdbcclient.JDBCPool
-import io.vertx.kotlin.coroutines.await
+import io.vertx.sqlclient.Pool
+import io.vertx.kotlin.coroutines.*
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.Tuple
@@ -13,7 +14,7 @@ import java.util.*
 
 class TokenDaoImpl : TokenDao() {
 
-    override suspend fun init(jdbcPool: JDBCPool, plugin: ParsekPlugin) {
+    override suspend fun init(jdbcPool: Pool, plugin: ParsekPlugin) {
         jdbcPool
             .query(
                 """
@@ -29,10 +30,10 @@ class TokenDaoImpl : TokenDao() {
                         """
             )
             .execute()
-            .await()
+            .coAwait()
     }
 
-    override suspend fun add(token: Token, jdbcPool: JDBCPool): UUID {
+    override suspend fun add(token: Token, jdbcPool: Pool): UUID {
         val query =
             "INSERT INTO `${getTablePrefix() + tableName}` (${fields.toTableQuery()}) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -50,7 +51,7 @@ class TokenDaoImpl : TokenDao() {
                     token.additionalClaims.encode()
                 )
             )
-            .await()
+            .coAwait()
 
         return token.id
     }
@@ -58,19 +59,19 @@ class TokenDaoImpl : TokenDao() {
     override suspend fun isExistsByTokenAndType(
         token: String,
         tokenType: TokenType,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ): Boolean {
         val query = "SELECT COUNT(`id`) FROM `${getTablePrefix() + tableName}` WHERE `token` = ? AND `type` = ?"
 
         val rows: RowSet<Row> = jdbcPool
             .preparedQuery(query)
             .execute(Tuple.of(token, tokenType.getTokenName()))
-            .await()
+            .coAwait()
 
         return rows.toList()[0].getLong(0) == 1L
     }
 
-    override suspend fun deleteByToken(token: String, jdbcPool: JDBCPool) {
+    override suspend fun deleteByToken(token: String, jdbcPool: Pool) {
         val query =
             "DELETE from `${getTablePrefix() + tableName}` WHERE `token` = ?"
 
@@ -79,10 +80,10 @@ class TokenDaoImpl : TokenDao() {
             .execute(
                 Tuple.of(token)
             )
-            .await()
+            .coAwait()
     }
 
-    override suspend fun deleteBySubject(subject: String, jdbcPool: JDBCPool) {
+    override suspend fun deleteBySubject(subject: String, jdbcPool: Pool) {
         val query =
             "DELETE from `${getTablePrefix() + tableName}` WHERE `subject` = ?"
 
@@ -91,10 +92,10 @@ class TokenDaoImpl : TokenDao() {
             .execute(
                 Tuple.of(subject)
             )
-            .await()
+            .coAwait()
     }
 
-    override suspend fun deleteBySubjectAndType(subject: String, type: TokenType, jdbcPool: JDBCPool) {
+    override suspend fun deleteBySubjectAndType(subject: String, type: TokenType, jdbcPool: Pool) {
         val query =
             "DELETE from `${getTablePrefix() + tableName}` WHERE `subject` = ? AND `type` = ?"
 
@@ -103,14 +104,14 @@ class TokenDaoImpl : TokenDao() {
             .execute(
                 Tuple.of(subject, type.getTokenName())
             )
-            .await()
+            .coAwait()
     }
 
     override suspend fun getByTokenSubjectAndType(
         token: String,
         subject: String,
         type: TokenType,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ): Token? {
         val query =
             "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` = ? AND `subject` = ? AND `type` = ?"
@@ -124,7 +125,7 @@ class TokenDaoImpl : TokenDao() {
                     type.getTokenName()
                 )
             )
-            .await()
+            .coAwait()
 
         if (rows.size() == 0) {
             return null
@@ -138,7 +139,7 @@ class TokenDaoImpl : TokenDao() {
     override suspend fun getByTokenAndSubject(
         token: String,
         subject: String,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ): Token? {
         val query =
             "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` = ? AND `subject` = ?"
@@ -151,7 +152,7 @@ class TokenDaoImpl : TokenDao() {
                     subject
                 )
             )
-            .await()
+            .coAwait()
 
         if (rows.size() == 0) {
             return null
@@ -164,7 +165,7 @@ class TokenDaoImpl : TokenDao() {
 
     override suspend fun getByToken(
         token: String,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ): Token? {
         val query =
             "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` = ?"
@@ -176,7 +177,7 @@ class TokenDaoImpl : TokenDao() {
                     token,
                 )
             )
-            .await()
+            .coAwait()
 
         if (rows.size() == 0) {
             return null
@@ -190,7 +191,7 @@ class TokenDaoImpl : TokenDao() {
     override suspend fun getLastBySubjectAndType(
         subject: String,
         type: TokenType,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ): Token? {
         val query =
             "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `subject` = ? AND `type` = ? order by `expireDate` DESC limit 1"
@@ -203,7 +204,7 @@ class TokenDaoImpl : TokenDao() {
                     type.getTokenName()
                 )
             )
-            .await()
+            .coAwait()
 
         if (rows.size() == 0) {
             return null
@@ -216,7 +217,7 @@ class TokenDaoImpl : TokenDao() {
 
     override suspend fun deleteById(
         id: UUID,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ) {
         val query =
             "DELETE FROM `${getTablePrefix() + tableName}` WHERE `id` = ?"
@@ -224,6 +225,6 @@ class TokenDaoImpl : TokenDao() {
         jdbcPool
             .preparedQuery(query)
             .execute(Tuple.of(id))
-            .await()
+            .coAwait()
     }
 }

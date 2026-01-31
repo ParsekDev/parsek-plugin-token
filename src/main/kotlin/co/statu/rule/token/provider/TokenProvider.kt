@@ -14,6 +14,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.vertx.core.json.JsonObject
 import io.vertx.jdbcclient.JDBCPool
+import io.vertx.sqlclient.Pool
 import java.util.*
 
 class TokenProvider private constructor(
@@ -100,7 +101,7 @@ class TokenProvider private constructor(
         tokenType: TokenType,
         expireDate: Long,
         additionalClaims: JsonObject = JsonObject(),
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ): UUID {
         val tokenObject = Token(
             subject = subject,
@@ -141,7 +142,7 @@ class TokenProvider private constructor(
         tokenDao.deleteByToken(token, jdbcPool)
     }
 
-    suspend fun invalidateTokensBySubjectAndType(subject: String, type: TokenType, jdbcPool: JDBCPool) {
+    suspend fun invalidateTokensBySubjectAndType(subject: String, type: TokenType, jdbcPool: Pool) {
         tokenDao.deleteBySubjectAndType(subject, type, jdbcPool)
     }
 
@@ -152,7 +153,7 @@ class TokenProvider private constructor(
         return verifier.verify(token)
     }
 
-    suspend fun invalidateByTokenId(id: UUID, jdbcPool: JDBCPool) {
+    suspend fun invalidateByTokenId(id: UUID, jdbcPool: Pool) {
         tokenDao.deleteById(id, jdbcPool)
     }
 
@@ -160,7 +161,7 @@ class TokenProvider private constructor(
         token: String,
         subject: String,
         type: TokenType,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ) = tokenDao.getByTokenSubjectAndType(
         token,
         subject,
@@ -171,7 +172,7 @@ class TokenProvider private constructor(
     suspend fun getByTokenAndSubject(
         token: String,
         subject: String,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ) = tokenDao.getByTokenAndSubject(
         token,
         subject,
@@ -180,7 +181,7 @@ class TokenProvider private constructor(
 
     suspend fun getByToken(
         token: String,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ) = tokenDao.getByToken(
         token,
         jdbcPool
