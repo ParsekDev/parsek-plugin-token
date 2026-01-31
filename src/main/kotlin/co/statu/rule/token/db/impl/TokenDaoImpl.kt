@@ -1,17 +1,23 @@
 package co.statu.rule.token.db.impl
 
 import co.statu.parsek.api.ParsekPlugin
+import co.statu.rule.database.annotation.Dao
 import co.statu.rule.token.db.dao.TokenDao
 import co.statu.rule.token.db.model.Token
 import co.statu.rule.token.type.TokenType
-import io.vertx.jdbcclient.JDBCPool
+import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.sqlclient.Pool
-import io.vertx.kotlin.coroutines.*
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.Tuple
+import org.springframework.beans.factory.config.ConfigurableBeanFactory
+import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Scope
 import java.util.*
 
+@Dao
+@Lazy
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 class TokenDaoImpl : TokenDao() {
 
     override suspend fun init(jdbcPool: Pool, plugin: ParsekPlugin) {
