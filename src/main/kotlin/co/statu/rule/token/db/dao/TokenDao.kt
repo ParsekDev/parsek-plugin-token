@@ -50,6 +50,12 @@ abstract class TokenDao : Dao<Token>(Token::class) {
         jdbcPool: Pool
     ): Token?
 
+    abstract suspend fun getAllBySubjectAndType(
+        subject: String,
+        type: TokenType,
+        jdbcPool: Pool
+    ): List<Token>
+
     abstract suspend fun deleteById(
         id: UUID,
         jdbcPool: Pool

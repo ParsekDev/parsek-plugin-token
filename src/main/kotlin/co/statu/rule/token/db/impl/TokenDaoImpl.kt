@@ -221,6 +221,27 @@ class TokenDaoImpl : TokenDao() {
         return row.toEntity()
     }
 
+    override suspend fun getAllBySubjectAndType(
+        subject: String,
+        type: TokenType,
+        jdbcPool: Pool
+    ): List<Token> {
+        val query =
+            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `subject` = ? AND `type` = ? order by `startDate` DESC"
+
+        val rows: RowSet<Row> = jdbcPool
+            .preparedQuery(query)
+            .execute(
+                Tuple.of(
+                    subject,
+                    type.getTokenName()
+                )
+            )
+            .coAwait()
+
+        return rows.map { it.toEntity() }
+    }
+
     override suspend fun deleteById(
         id: UUID,
         jdbcPool: Pool
