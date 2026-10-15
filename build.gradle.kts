@@ -2,10 +2,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     `java-library`
-    kotlin("jvm") version "2.3.0"
-    kotlin("kapt") version "2.3.0"
-    id("com.gradleup.shadow") version "9.3.1"
-    id("org.jreleaser") version "1.14.0"
+    kotlin("jvm") version "2.4.21"
+    kotlin("kapt") version "2.4.21"
+    id("com.gradleup.shadow") version "9.6.1"
+    id("org.jreleaser") version "1.26.0"
     `maven-publish`
     signing
 }
@@ -14,13 +14,13 @@ group = "dev.parsek"
 version =
     (if (project.hasProperty("version") && project.findProperty("version") != "unspecified") project.findProperty("version") else "local-build")!!
 
-val pf4jVersion: String by project
-val vertxVersion: String by project
-val gsonVersion: String by project
-val springContextVersion: String by project
-val handlebarsVersion: String by project
+val pf4jVersion = project.property("pf4jVersion") as String
+val vertxVersion = project.property("vertxVersion") as String
+val gsonVersion = project.property("gsonVersion") as String
+val springContextVersion = project.property("springContextVersion") as String
+val handlebarsVersion = project.property("handlebarsVersion") as String
 val bootstrap = (project.findProperty("bootstrap") as String?)?.toBoolean() ?: false
-val pluginsDir: File? by rootProject.extra
+val pluginsDir = rootProject.extra.properties["pluginsDir"] as File?
 
 repositories {
     mavenCentral()
@@ -49,11 +49,18 @@ dependencies {
     kapt("org.pf4j:pf4j:${pf4jVersion}")
 
     compileOnly("io.vertx:vertx-lang-kotlin:$vertxVersion")
+
+    // Vert.x 5.1+ moved @Nullable to vertx-codegen-api; Kotlin 2.4 needs it on the classpath for inferred types
+
+    compileOnly("io.vertx:vertx-codegen-api:$vertxVersion")
     compileOnly("io.vertx:vertx-lang-kotlin-coroutines:$vertxVersion")
     compileOnly("io.vertx:vertx-jdbc-client:$vertxVersion")
 
     // https://mvnrepository.com/artifact/com.auth0/java-jwt
-    api("com.auth0:java-jwt:4.4.0")
+    // Jackson comes from the host (Parsek.jar) so no second, older copy is packed into the plugin
+    api("com.auth0:java-jwt:4.6.2") {
+        exclude(group = "com.fasterxml.jackson.core")
+    }
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     compileOnly("com.google.code.gson:gson:$gsonVersion")
@@ -71,10 +78,10 @@ tasks {
     }
 
     shadowJar {
-        val pluginId: String by project
-        val pluginClass: String by project
-        val pluginProvider: String by project
-        val pluginDependencies: String by project
+        val pluginId = project.property("pluginId") as String
+        val pluginClass = project.property("pluginClass") as String
+        val pluginProvider = project.property("pluginProvider") as String
+        val pluginDependencies = project.property("pluginDependencies") as String
 
         manifest {
             attributes["main-class"] = pluginClass
@@ -97,7 +104,9 @@ tasks {
         dependencies {
             exclude(dependency("io.vertx:vertx-core"))
             exclude {
-                it.moduleGroup == "io.netty" || it.moduleGroup == "org.slf4j"
+                // The host (Parsek.jar) provides Netty, slf4j, Jackson 2 and vertx-core-logging (split out of vertx-core in 5.1)
+                it.moduleGroup == "io.netty" || it.moduleGroup == "org.slf4j" ||
+                    it.moduleGroup == "com.fasterxml.jackson.core" || it.moduleName == "vertx-core-logging"
             }
         }
     }
