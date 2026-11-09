@@ -67,9 +67,18 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.springframework/spring-context
     compileOnly("org.springframework:spring-context:$springContextVersion")
+
+    testImplementation(kotlin("stdlib-jdk8"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.14.4")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.14.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.14.4")
 }
 
 tasks {
+    test {
+        useJUnitPlatform()
+    }
+
     build {
         dependsOn(shadowJar)
         dependsOn("copyJar")

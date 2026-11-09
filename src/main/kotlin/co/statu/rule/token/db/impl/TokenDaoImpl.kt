@@ -5,6 +5,7 @@ import co.statu.rule.database.annotation.Dao
 import co.statu.rule.token.db.dao.TokenDao
 import co.statu.rule.token.db.model.Token
 import co.statu.rule.token.type.TokenType
+import co.statu.rule.token.util.TokenHash
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.sqlclient.Pool
 import io.vertx.sqlclient.Row
@@ -50,7 +51,7 @@ class TokenDaoImpl : TokenDao() {
                 Tuple.of(
                     token.id,
                     token.subject,
-                    token.token,
+                    TokenHash.hash(token.token),
                     token.type.getTokenName(),
                     token.expireDate,
                     token.startDate,
@@ -67,24 +68,28 @@ class TokenDaoImpl : TokenDao() {
         tokenType: TokenType,
         jdbcPool: Pool
     ): Boolean {
-        val query = "SELECT COUNT(`id`) FROM `${getTablePrefix() + tableName}` WHERE `token` = ? AND `type` = ?"
+        val lookup = TokenHash.lookupValues(token)
+
+        val query = "SELECT COUNT(`id`) FROM `${getTablePrefix() + tableName}` WHERE `token` IN (?, ?) AND `type` = ?"
 
         val rows: RowSet<Row> = jdbcPool
             .preparedQuery(query)
-            .execute(Tuple.of(token, tokenType.getTokenName()))
+            .execute(Tuple.of(lookup.first, lookup.second, tokenType.getTokenName()))
             .coAwait()
 
-        return rows.toList()[0].getLong(0) == 1L
+        return rows.toList()[0].getLong(0) > 0L
     }
 
     override suspend fun deleteByToken(token: String, jdbcPool: Pool) {
+        val lookup = TokenHash.lookupValues(token)
+
         val query =
-            "DELETE from `${getTablePrefix() + tableName}` WHERE `token` = ?"
+            "DELETE from `${getTablePrefix() + tableName}` WHERE `token` IN (?, ?)"
 
         jdbcPool
             .preparedQuery(query)
             .execute(
-                Tuple.of(token)
+                Tuple.of(lookup.first, lookup.second)
             )
             .coAwait()
     }
@@ -119,14 +124,17 @@ class TokenDaoImpl : TokenDao() {
         type: TokenType,
         jdbcPool: Pool
     ): Token? {
+        val lookup = TokenHash.lookupValues(token)
+
         val query =
-            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` = ? AND `subject` = ? AND `type` = ?"
+            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` IN (?, ?) AND `subject` = ? AND `type` = ?"
 
         val rows: RowSet<Row> = jdbcPool
             .preparedQuery(query)
             .execute(
                 Tuple.of(
-                    token,
+                    lookup.first,
+                    lookup.second,
                     subject,
                     type.getTokenName()
                 )
@@ -147,14 +155,17 @@ class TokenDaoImpl : TokenDao() {
         subject: String,
         jdbcPool: Pool
     ): Token? {
+        val lookup = TokenHash.lookupValues(token)
+
         val query =
-            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` = ? AND `subject` = ?"
+            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` IN (?, ?) AND `subject` = ?"
 
         val rows: RowSet<Row> = jdbcPool
             .preparedQuery(query)
             .execute(
                 Tuple.of(
-                    token,
+                    lookup.first,
+                    lookup.second,
                     subject
                 )
             )
@@ -173,14 +184,17 @@ class TokenDaoImpl : TokenDao() {
         token: String,
         jdbcPool: Pool
     ): Token? {
+        val lookup = TokenHash.lookupValues(token)
+
         val query =
-            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` = ?"
+            "SELECT ${fields.toTableQuery()} FROM `${getTablePrefix() + tableName}` WHERE `token` IN (?, ?)"
 
         val rows: RowSet<Row> = jdbcPool
             .preparedQuery(query)
             .execute(
                 Tuple.of(
-                    token,
+                    lookup.first,
+                    lookup.second,
                 )
             )
             .coAwait()

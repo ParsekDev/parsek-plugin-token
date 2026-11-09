@@ -9,6 +9,7 @@ import co.statu.rule.token.db.impl.TokenDaoImpl
 import co.statu.rule.token.db.model.Token
 import co.statu.rule.token.event.TokenEventListener
 import co.statu.rule.token.type.TokenType
+import co.statu.rule.token.util.TokenHash
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -152,6 +153,12 @@ class TokenProvider private constructor(
 
         return verifier.verify(token)
     }
+
+    /**
+     * Whether the stored [row] is the presented [raw] token. Rows hold the token's hash (old rows the raw value), so
+     * never compare `row.token` with a raw token directly.
+     */
+    fun matches(row: Token, raw: String?): Boolean = TokenHash.matches(row.token, raw)
 
     suspend fun invalidateByTokenId(id: UUID, jdbcPool: Pool) {
         tokenDao.deleteById(id, jdbcPool)
